@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pydantic
+anthropic[vertex]
+pyyaml
+aiofiles
+python-multipart
+langchain
+langchain-google-vertexai
+numpy
+requests
+mcp
+streamlit

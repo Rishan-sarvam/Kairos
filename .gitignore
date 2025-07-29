@@ -1,6 +1,7 @@
 __pycache__
-app/__pycache__
-app/providers/__pycache__
+kairos/__pycache__
+kairos/app/__pycache__
+kairos/app/providers/__pycache__
 .env
 .venv/
 .DS_Store

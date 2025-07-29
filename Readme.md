@@ -18,10 +18,10 @@ export PROJECT_ID="gcp-project-id"
 
 ### Usage as a Server
 
-Run Kairos as a FastAPI server:
+Run Kairos as a FastAPI server using the command line:
 
 ```bash
-python server.py
+python3 kairos.server
 ```
 
 The server will be available at `http://localhost:8000` with the following endpoints:

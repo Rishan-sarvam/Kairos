@@ -1,0 +1,14 @@
+servers:
+  - name: playwright
+    type: node
+    path: "@playwright/mcp"
+    args:
+      - "--headless"
+      - "--no-sandbox"
+      - "--isolated"
+    env:
+      PLAYWRIGHT_HEADLESS: "true"
+
+defaults:
+  python_env_path: 
+  node_command: npx

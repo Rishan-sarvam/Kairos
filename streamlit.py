@@ -104,10 +104,6 @@ def main():
     # Main content
     st.markdown('<h1 class="main-header">Web Application Evaluation Framework</h1>', unsafe_allow_html=True)
     
-    # # Input section
-    # st.markdown('<div class="evaluation-card">', unsafe_allow_html=True)
-    # # st.subheader("📝 Evaluation Configuration")
-    
     col1, col2 = st.columns([1, 1])
     
     with col1:
@@ -128,8 +124,6 @@ def main():
         # URL validation
         if generated_app_url and not (generated_app_url.startswith('http://') or generated_app_url.startswith('https://')):
             st.warning("⚠️ Please enter a valid URL starting with http:// or https://")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
     
     # Run evaluation button
     col1, col2, col3 = st.columns([1, 2, 1])

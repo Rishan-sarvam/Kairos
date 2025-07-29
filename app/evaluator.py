@@ -7,7 +7,7 @@ import threading
 from typing import List, Dict, Any
 
 from .base import LLMClient
-from .models import UserInput, EvaluationResult, EvaluationType, TestResult
+from .models import UserInput, EvaluationResult, EvaluationType
 from .prompts import evaluation_prompt_template, QUALITATIVE_EVAL_PROMPT
 
 class Evaluator:
@@ -21,17 +21,9 @@ class Evaluator:
         start_time = time.time()
         
         try:
-            # # Initialize MCP if needed
-            # if not self.llm_client.mcp_manager:
-                # await self.llm_client.initialize_mcp()
-            
             if user_input.evaluation_type == EvaluationType.QUALITATIVE:
-                # await self.llm_client.initialize_mcp()
-                print(f"🤖 Evaluator: {self.llm_client.mcp_manager}")
                 result = await self._run_qualitative_evaluation(user_input)
             elif user_input.evaluation_type == EvaluationType.FEATURE_CORRECTNESS:
-                # await self.llm_client.initialize_mcp()
-                # await self.llm_client.initialize_mcp()
                 result = await self._run_feature_correctness_evaluation(user_input)
             else:
                 raise ValueError(f"Unsupported evaluation type: {user_input.evaluation_type}")
@@ -107,13 +99,10 @@ class Evaluator:
             else:
                 # Run single evaluation
                 result1 = await self._run_single_evaluation(test_plan_json, user_input.app_url, 0)
-                # all_test_results = single_result.test_results
-                # overall_success = single_result.success
                 return EvaluationResult(
                 evaluation_type=user_input.evaluation_type,
                 provider_used=self.llm_client.provider,
                 success=True,
-                # test_results=all_test_results,
                 raw_response={"result1": result1}
             )
             
@@ -121,7 +110,6 @@ class Evaluator:
                 evaluation_type=user_input.evaluation_type,
                 provider_used=self.llm_client.provider,
                 success=True,
-                # test_results=all_test_results,
                 raw_response={"results": results}
             )
             
@@ -137,16 +125,6 @@ class Evaluator:
                                        test_plan_half2: List[Dict], 
                                        url: str) -> List[EvaluationResult]:
         """Run two evaluation halves in parallel using threading"""
-        
-        # def run_agent_sync(test_plan, thread_id):
-        #     """Wrapper to run async evaluation in a thread"""
-        #     loop = asyncio.new_event_loop()
-        #     asyncio.set_event_loop(loop)
-        #     try:
-        #         result = loop.run_until_complete(self._run_single_evaluation(test_plan, url, thread_id))
-        #         return result
-        #     finally:
-        #         loop.close()
 
         def run_agent_sync(test_plan, thread_id):
             """Wrapper to run async evaluation in a thread"""
@@ -201,7 +179,7 @@ class Evaluator:
         """Fetch HTML content from URL"""
         try:
             response = requests.get(url, timeout=30)
-            response.raise_for_status()               # Raise an exception for HTTP errors
+            response.raise_for_status()
             return response.text
         except Exception as e:
             raise Exception(f"Failed to fetch HTML content from {url}: {str(e)}")
@@ -217,72 +195,3 @@ class Evaluator:
                 raise Exception("No JSON code block found in test plan response")
         except json.JSONDecodeError as e:
             raise Exception(f"Failed to parse test plan JSON: {str(e)}")
-
-    # def _parse_evaluation_response(self, response: str, test_plan: List[Dict]) -> List[TestResult]:
-    #     """Parse evaluation response and create TestResult objects"""
-    #     test_results = []
-        
-    #     try:
-    #         # Try to parse JSON response
-    #         match = re.search(r"```json\s*(.*?)\s*```", response, re.DOTALL)
-    #         if match:
-    #             json_str = match.group(1)
-    #             eval_data = json.loads(json_str)
-                
-    #             overall_status = eval_data.get("Overall_status", "UNKNOWN")
-    #             failed_features = eval_data.get("Failed_features_reason", [])
-    #             failed_elements = eval_data.get("Failed_elements", [])
-                
-    #             # Create test results based on test plan
-    #             for i, test in enumerate(test_plan):
-    #                 test_feature = test.get("Test_feature", f"Test {i+1}")
-    #                 description = test.get("Description", "")
-    #                 actions = test.get("Actions", "")
-    #                 assertions = test.get("Assertions", "")
-                    
-    #                 # Determine if this test passed
-    #                 passed = overall_status == "PASS"
-    #                 error_message = None
-                    
-    #                 # Check if this specific test failed
-    #                 if not passed:
-    #                     for failure in failed_features:
-    #                         if test_feature.lower() in failure.lower():
-    #                             error_message = failure
-    #                             break
-    #                     if not error_message and failed_features:
-    #                         error_message = failed_features[0]
-                    
-    #                 test_results.append(TestResult(
-    #                     test_feature=test_feature,
-    #                     description=description,
-    #                     actions=actions,
-    #                     assertions=assertions,
-    #                     passed=passed,
-    #                     error_message=error_message
-    #                 ))
-    #         else:
-    #             # Fallback: create test results from test plan with unknown status
-    #             for i, test in enumerate(test_plan):
-    #                 test_results.append(TestResult(
-    #                     test_feature=test.get("Test_feature", f"Test {i+1}"),
-    #                     description=test.get("Description", ""),
-    #                     actions=test.get("Actions", ""),
-    #                     assertions=test.get("Assertions", ""),
-    #                     passed=False,
-    #                     error_message="Could not parse evaluation response"
-    #                 ))
-                    
-    #     except Exception as e:
-    #         # Fallback: create failed test results
-    #         for i, test in enumerate(test_plan):
-    #             test_results.append(TestResult(
-    #                 test_feature=test.get("Test_feature", f"Test {i+1}"),
-    #                 description=test.get("Description", ""),
-    #                 actions=test.get("Actions", ""),
-    #                 assertions=test.get("Assertions", ""),
-    #                 passed=False,
-    #                 error_message=f"Evaluation parsing failed: {str(e)}"
-    #             ))
-        
-    #     return test_results

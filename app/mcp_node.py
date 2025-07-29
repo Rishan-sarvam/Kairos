@@ -54,7 +54,7 @@ class MCPServerClient:
         return await self.session.call_tool(tool_name, tool_args)
 
     async def cleanup(self):
-        if self.exit_stack:  # Change: Check if exists
+        if self.exit_stack:
             await self.exit_stack.aclose()
 
 

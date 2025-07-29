@@ -2,14 +2,12 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional, List
 from .models import UserInput, EvaluationResult, LLMProvider
 from .mcp_node import MCPToolManager
-# from pathlib import Path
 
 class LLMClient(ABC):
     def __init__(self, llm_model_name: str, temperature: float = 0.1, **kwargs):
         self.llm_model_name = llm_model_name
         self.temperature = temperature
         self.mcp_manager: List[MCPToolManager] = [None, None]
-        # current_dir = Path(__file__).parent
         self.playwright_config_path = str("./playwright.config.yml")
         
         self.config = kwargs

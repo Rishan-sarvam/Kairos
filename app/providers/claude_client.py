@@ -173,29 +173,6 @@ Make sure to wrap the JSON with ```json and ``` code blocks."""
         except Exception as e:
             raise Exception(f"Failed to run evaluation with tools: {str(e)}")
     
-    # async def _convert_mcp_tools(self) -> List[StructuredTool]:
-    #     """Convert MCP tools to LangChain StructuredTools"""
-    #     tools = []
-    #     for tool_name, tool_meta in self.mcp_manager.return_documentation().items():
-    #         args_model = self._schema_to_model(tool_name, tool_meta["parameters_dict"])
-            
-    #         async def _arun(**kwargs):
-    #             success, out = await self.mcp_manager.call_tool(tool_name, kwargs)
-    #             if not success:
-    #                 raise RuntimeError(out["error"])
-    #             out_json = json.dumps(self._normalise(out), default=self._json_safe)
-    #             return self._truncate(out_json)
-            
-    #         tool = StructuredTool.from_function(
-    #             name=tool_name,
-    #             description=tool_meta["documentation"],
-    #             args_schema=args_model,
-    #             coroutine=_arun,
-    #             return_direct=False,
-    #         )
-    #         tools.append(tool)
-        
-    #     return tools
     
     def _wrap_mcp_tool(self, name: str, meta: Dict[str, Any], thread_id: Optional[int] = None) -> StructuredTool:
         ArgsModel = self._schema_to_model(name, meta["parameters_dict"])

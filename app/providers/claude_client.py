@@ -1,6 +1,4 @@
-import asyncio
 import json
-import re
 import tempfile
 import os
 from typing import List, Dict, Any, Optional
@@ -18,6 +16,13 @@ from pydantic import BaseModel, Field, create_model
 from ..base import LLMClient
 from ..models import LLMProvider
 from ..mcp_node import MCPToolManager
+import os
+import dotenv
+
+dotenv.load_dotenv()
+model_name = os.getenv("MODEL_NAME")
+location = os.getenv("LOCATION")
+project_id = os.getenv("PROJECT_ID")
 
 # Configuration constants
 MAX_LLM_TOKENS = 4096
@@ -32,8 +37,8 @@ except ImportError:
     ImageContent = None
 
 class ClaudeClient(LLMClient):
-    def __init__(self, model_name: str = "claude-sonnet-4@20250514", 
-                 location: str = "us-east5", project_id: str = "sarvam-dash",
+    def __init__(self, model_name: str = model_name,    
+                 location: str = location, project_id: str = project_id,
                  temperature: float = 0.1, **kwargs):
         super().__init__(model_name, temperature, **kwargs)
         self.location = location

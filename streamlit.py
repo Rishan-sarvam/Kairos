@@ -8,7 +8,7 @@ import os
 # Add the src directory to the path so we can import from main.py
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from main_parallel import run_qualitative_evaluation, run_feature_correctness
+from kairos import run_evaluation
 
 # Set page config
 st.set_page_config(
@@ -51,9 +51,9 @@ async def run_async_evaluation(evaluation_type: str, user_query: str, url: str):
     """Wrapper function to run async evaluation functions"""
     try:
         if evaluation_type == "Qualitative Evaluation":
-            return await run_qualitative_evaluation(user_query, url)
+            return await run_evaluation(user_query, url, evaluation_type="qualitative")
         else:
-            return await run_feature_correctness(user_query, url)
+            return await run_evaluation(user_query, url, evaluation_type="feature_correctness")
     except Exception as e:
         return f"Error during evaluation: {str(e)}"
 
@@ -104,9 +104,9 @@ def main():
     # Main content
     st.markdown('<h1 class="main-header">Web Application Evaluation Framework</h1>', unsafe_allow_html=True)
     
-    # Input section
-    st.markdown('<div class="evaluation-card">', unsafe_allow_html=True)
-    # st.subheader("📝 Evaluation Configuration")
+    # # Input section
+    # st.markdown('<div class="evaluation-card">', unsafe_allow_html=True)
+    # # st.subheader("📝 Evaluation Configuration")
     
     col1, col2 = st.columns([1, 1])
     
@@ -214,29 +214,6 @@ def main():
         if st.button("🗑️ Clear All Results", type="secondary"):
             st.session_state.evaluation_results = []
             st.rerun()
-
-    # Footer
-    # Ensure the footer is always at the bottom by using absolute positioning
-    st.markdown("""
-    <style>
-    .custom-footer {
-        position: fixed;
-        left: 0;
-        right: 20px;
-        bottom: 0;
-        width: 100vw;
-        border-top: 1px solid #eee;
-        text-align: center;
-        color: #666;
-        padding: 20px 0 10px 0;
-        z-index: 9999;
-    }
-    </style>
-    <div class="custom-footer">
-        <p>🔍 Web Application Evaluation Framework</p>
-        <p><small>Powered by Playwright, Claude, and LangChain</small></p>
-    </div>
-    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()

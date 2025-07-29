@@ -16,21 +16,6 @@ export LOCATION="gcp-region"
 export PROJECT_ID="gcp-project-id"
 ```
 
-### Usage as a Package
-
-Import and use Kairos directly in your Python code:
-
-```python
-from app.evaluator import WebAppEvaluator
-
-evaluator = WebAppEvaluator()
-result = evaluator.evaluate_feature_correctness(
-    user_query="Test the login functionality",
-    url="https://your-app.com"
-)
-print(result)
-```
-
 ### Usage as a Server
 
 Run Kairos as a FastAPI server:
@@ -40,17 +25,26 @@ python server.py
 ```
 
 The server will be available at `http://localhost:8000` with the following endpoints:
-- `POST /feature-test` - Feature correctness evaluation
+
+**Feature Correctness Evaluation:**
+```bash
+curl -X POST http://localhost:8000/evaluation/feature-test \
+  -H "Content-Type: application/json" \
+  -d '{"user_query": "Test the login functionality", "url": "https://your-app.com"}'
+```
+
+**Qualitative Evaluation:**
+```bash
+curl -X POST http://localhost:8000/evaluation/qualitative \
+  -H "Content-Type: application/json" \
+  -d '{"user_query": "Evaluate the user experience", "url": "https://your-app.com"}'
+```
 
 ### Usage as Streamlit
 
 Launch the web interface for interactive evaluation:
 
 ```bash
-# Option 1: Using the launcher script
-python kairos.py
-
-# Option 2: Direct Streamlit command
 streamlit run streamlit.py
 ```
 

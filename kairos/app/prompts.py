@@ -59,52 +59,111 @@ Do not include any other text in your response, just the json object.
 * **APP:** {url}
 """
 
-QUALITATIVE_EVAL_PROMPT = """* You are an intelligent app evaluator.
+INSTRUCTIONS = """
+Rating Philosophy
+For each rubric, the rater should evaluate their agreement with the provided statement, based on their overall impression of the web application. The focus is not on rating features in isolation but on expressing how positively or negatively the rater feels toward the full statement in context.
+The rater is expected to make a subjective judgment along a 4-point Likert scale:
+Strongly Disagree – You feel strongly negative toward the statement. The app clearly fails to meet the expectations described.
+Disagree – You slightly or moderately disagree with the statement. There are notable shortcomings, but not severe enough to warrant strong rejection.
+Agree – You somewhat or mostly agree with the statement. The app satisfies the expectation in general, with only minor issues.
+Strongly Agree – You feel strongly positive toward the statement. The app fully meets or exceeds the expectation in a clear and convincing way.
+
+Improvement Suggestion Policy
+For each rubric section (e.g., Visual Appeal, Content Quality), if any of the statements receive a rating below Strongly Agree, the rater must provide one improvement suggestion for that statement as part of a single feedback for the entire rubric. For each rubric provide this as a bulleted point 
+The purpose of this policy is to guide continuous improvement in areas that are not fully satisfactory, while maintaining a streamlined evaluation process.
+
+Here are the detailed rubrics:
+"""
+VISUAL_UX_RUBRIC = """
+### VISUAL_UX
+• visual_appeal – The layout is clear and uncluttered.  
+• element_diversity – The page shows a good variety of elements.  
+• color_harmony – The colors are used in a harmonious way.  
+• design_craftsmanship – The design details are polished and thoughtful.
+"""
+
+CONTENT_QUALITY_RUBRIC = """
+### CONTENT_QUALITY
+• copy_clarity – The writing is clear and the text is visible and easy to understand.  
+• organization – Information is structured for quick scanning.  
+• content_relevance – All content helps users achieve their goal.  
+• richness – Charts, tables, or images meaningfully support the text.
+"""
+
+CONTENT_GROUNDING_RUBRIC = """
+### CONTENT_GROUNDING
+• accuracy – All facts, figures, and values are correct.  
+• plausibility – Sample data (names, dates, prices, etc.) looks realistic.  
+• attribution – Sources and timestamps of data are clearly indicated.  
+• consistency – The same data is presented uniformly across the app.
+"""
+
+NAVIGATION_RUBRIC = """
+### NAVIGATION
+• discoverability – Buttons, links, and menus are easy to find.  
+• task_flow – Users can complete key tasks in a short and clear sequence.  
+• feedback – The interface clearly shows where the user is and what happened after each click.  
+• accessibility – The app is navigable using keyboard or assistive tools.
+"""
+
+DATA_CONSISTENCY_RUBRIC = """
+### DATA_CONSISTENCY
+• synchronization – When data changes in one place, it updates everywhere else.  
+• format_uniformity – Dates, numbers, and labels use consistent formats throughout.  
+• multi_view_coherence – Information appears identically across all views.  
+• persistence – Data remains saved after reload or logout.
+"""
+
+FEATURE_COVERAGE_RUBRIC = """
+### FEATURE_COVERAGE
+• very_low_feature_coverage – Score 1: Very low feature coverage (< Quarter (¼)).  
+• low_feature_coverage – Score 2: Low feature coverage (¼ – ½).  
+• high_feature_coverage – Score 3: High feature coverage (½ – ¾).  
+• very_high_feature_coverage – Score 4: Very high feature coverage (¾ – Full (1)).
+"""
+
+QUALITATIVE_EVAL_PROMPT = f"""
+* You are an intelligent app evaluator.
 * You are given a live, dynamic web application and must explore **all** pages—scroll, click every menu item or button, resize the window, and test form inputs—to understand the complete user journey.
 
-### Detailed Evaluation Rubrics
-1. **Visual & UX**  
-   Evaluate how the interface looks **and** feels to use. Consider:  
-   • *Visual appeal* – cohesiveness of colour palette, typography, iconography, spacing, and overall polish.  
-   • *Layout clarity* – logical grouping of elements, clear visual hierarchy, consistent component sizing.  
-   • *Navigation flow* – intuitive menus, breadcrumbs, back/forward cues, discoverability of key actions.  
-   • *Responsiveness & accessibility* – adapts gracefully to mobile/tablet, keyboard-only navigation, focus states, ARIA/alt text, contrast ratios.  
-   • *Micro-interactions & feedback* – hover states, button states, loading spinners, success / error toasts that reassure the user.  
+{INSTRUCTIONS}
 
-2. **Content & Information Quality**  
-   Judge the clarity, completeness, and presentation of all data and copy. Check:  
-   • *Copy accuracy & tone* – correct grammar, consistent terminology, jargon explained.  
-   • *Data fidelity* – numbers match source, units shown, no truncation or obvious mis-rounding.  
-   • *Visual presentation* – charts/graphs labelled, legends present, colour scales sensible, tooltips available.  
-   • *Contextual guidance* – inline help, onboarding tips, empty-state messages that explain next steps.  
-   • *Cognitive load* – avoids walls of text, uses headings, bullets, or tabs to break up information.  
+{VISUAL_UX_RUBRIC}
+{CONTENT_QUALITY_RUBRIC}
+{CONTENT_GROUNDING_RUBRIC}
+{NAVIGATION_RUBRIC}
+{DATA_CONSISTENCY_RUBRIC}
+{FEATURE_COVERAGE_RUBRIC}
 
-3. **Goal Completion (Purpose Fit)**  
-   Decide whether a typical user can accomplish the app's stated purpose end-to-end. Look for:  
-   • *Task coverage* – all primary flows (e.g., sign-up → create item → save/export) are present and discoverable.  
-   • *Workflow integrity* – steps are in logical order, confirmations shown, no dead ends or circular links.  
-   • *Edge cases & recovery* – sensible defaults, validation messages for invalid input, empty-state handling.  
-   • *Value delivery* – final outputs are actionable, trustworthy, and clearly tied to the problem the app claims to solve.  
+### Output Format
+Retur your output strictly in the following json format.
 
-### Output format
-Return just **one** JSON object—**no scores**, only whether improvements are needed and concrete advice:
+{{
+  "visual_ux": {{
+    "visual_appeal": "Agree",
+    "element_diversity": "Strongly Agree",
+    "color_harmony": "Agree",
+    "design_craftsmanship": "Disagree",
+    "improvement_suggestion": "Polish button shadows and align card spacing to reduce visual noise."
+  }},
+  "content_quality": {{
+    "copy_clarity": "Strongly Agree",
+    "organization": "Agree",
+    "content_relevance": "Agree",
+    "richness": "Disagree",
+    "improvement_suggestion": "Add meaningful captions to charts and replace placeholder imagery with real examples."
+  }},
+  "content_grounding": {{
+    "accuracy": "Strongly Agree",
+    "plausibility": "Agree",
+    "attribution": "Disagree",
+    "consistency": "Agree",
+    "improvement_suggestion": "Cite data sources directly under each metric to build trust."
+  }}
+}}
 
-{
-  "visual_ux": {
-    "improvement_needed": "Yes/No",
-    "improvement_suggestion": "One-to-two sentences of actionable fixes"
-  },
-  "content_quality": {
-    "improvement_needed": "Yes/No",
-    "improvement_suggestion": "..."
-  },
-  "goal_completion": {
-    "improvement_needed": "Yes/No",
-    "improvement_suggestion": "..."
-  }
-}
+Input:
+User Query: {{user_query}}
 
-User Query: {user_query}
-
-APP URL: {app_url}
-""" 
+APP URL: {{app_url}}
+"""

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional, List
-from .models import UserInput, EvaluationResult, LLMProvider
+from .models import LLMProvider
 from .mcp_node import MCPToolManager
 
 class LLMClient(ABC):
@@ -9,7 +9,6 @@ class LLMClient(ABC):
         self.temperature = temperature
         self.mcp_manager: List[MCPToolManager] = [None, None]
         self.playwright_config_path = str("./kairos/playwright.config.yml")
-        
         self.config = kwargs
     
     async def initialize_mcp(self, thread_id: Optional[int] = None):
@@ -22,13 +21,8 @@ class LLMClient(ABC):
             self.mcp_manager = None
     
     @abstractmethod
-    async def generate_response(self, prompt: str, **kwargs) -> str:
+    async def generate_response(self, prompt: str, system_prompt: str, **kwargs) -> str:
         """Generate a response from the LLM."""
-        pass
-    
-    @abstractmethod 
-    async def create_test_plan(self, user_query: str, html_content: str) -> str:
-        """Create a test plan for the application"""
         pass
     
     @abstractmethod

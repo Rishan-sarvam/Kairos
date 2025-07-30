@@ -8,7 +8,7 @@ from typing import List, Dict, Any
 
 from .base import LLMClient
 from .models import UserInput, EvaluationResult, EvaluationType
-from .prompts import evaluation_prompt_template, QUALITATIVE_EVAL_PROMPT
+from .prompts import evaluation_prompt_template, QUALITATIVE_EVAL_PROMPT, test_plan_system_prompt, test_plan_prompt
 
 class Evaluator:
     def __init__(self, llm_client: LLMClient):
@@ -76,9 +76,9 @@ class Evaluator:
             html_content = await self._fetch_html_content(user_input.app_url)
             
             # Step 2: Create test plan
-            test_plan_response = await self.llm_client.create_test_plan(
-                user_input.user_query, 
-                html_content
+            test_plan_response = await self.llm_client.generate_response(
+                test_plan_prompt.format(user_query=user_input.user_query, html_content=html_content),
+                test_plan_system_prompt
             )
             
             # Step 3: Parse test plan

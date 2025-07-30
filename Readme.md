@@ -1,8 +1,8 @@
-# Kairos - Web Application Evaluation System
+# Kairos - An ML-Based Oracle for Web Application Quality and Correctness Evaluation
 
 ## Introduction
 
-Kairos is a comprehensive web application evaluation system that provides automated testing capabilities using Playwright browser automation and Claude Sonnet 4 for intelligent analysis. The system can be used as a Python package, deployed as a server, or run through a user-friendly Streamlit interface.
+Kairos is an advanced multi-agent system designed to accelerate the evaluation and improvement of AI-generated web applications. While AI can quickly generate functional web apps, these often exhibit subtle but significant shortcomings—for example, a shopping cart that works but places the "checkout" button in an unexpected location, color schemes that technically meet accessibility standards but clash visually, or multi-step forms that are logically sound yet unintuitive for users. Kairos addresses these challenges by combining automated browser testing with intelligent qualitative analysis, enabling both functional and user experience assessments. Whether used as a Python package, a server, or through an interactive Streamlit interface, Kairos empowers teams to identify, understand, and resolve the nuanced issues that AI-generated apps frequently exhibit.
 
 ## Usage
 

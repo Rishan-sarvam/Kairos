@@ -54,8 +54,18 @@ class MCPServerClient:
         return await self.session.call_tool(tool_name, tool_args)
 
     async def cleanup(self):
-        if self.exit_stack:
-            await self.exit_stack.aclose()
+        if hasattr(self, 'exit_stack') and self.exit_stack:
+            try:
+                await self.exit_stack.aclose()
+            except RuntimeError as e:
+                if "event loop is closed" in str(e):
+                    # Event loop is already closed, ignore this error
+                    pass
+                else:
+                    raise
+            except Exception as e:
+                # Log other exceptions but don't raise them during cleanup
+                print(f"Warning: Error during MCP cleanup: {e}")
 
 
 class MCPToolManager:

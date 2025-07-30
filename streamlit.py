@@ -51,9 +51,9 @@ async def run_async_evaluation(evaluation_type: str, user_query: str, url: str):
     """Wrapper function to run async evaluation functions"""
     try:
         if evaluation_type == "Qualitative Evaluation":
-            return await run_evaluation(user_query, url, evaluation_type="qualitative")
+            return await run_evaluation(user_query, url, provider="claude-vertex", evaluation_type="qualitative")
         else:
-            return await run_evaluation(user_query, url, evaluation_type="feature_correctness")
+            return await run_evaluation(user_query, url, provider="claude-vertex", evaluation_type="feature_correctness")
     except Exception as e:
         return f"Error during evaluation: {str(e)}"
 

@@ -8,12 +8,21 @@ from kairos.app.evaluator import Evaluator
 async def run_evaluation(
     user_query: str,
     app_url: str,
-    provider: LLMProvider = LLMProvider.CLAUDE_VERTEX,
+    provider: str,
     evaluation_type: str = "qualitative",
     temperature: float = 0.1
 ):
     """Run Feature Correctness evaluation"""
     print("🧪 Running Evaluation...")
+
+    if provider == "claude-vertex":
+        llm_provider = LLMProvider.CLAUDE_VERTEX
+    elif provider == "openai":
+        llm_provider = LLMProvider.OPENAI
+    elif provider == "anthropic":
+        llm_provider = LLMProvider.ANTHROPIC
+    else:
+        raise ValueError(f"Invalid provider: {provider}")
     
     if evaluation_type == "qualitative":
         eval_type = EvaluationType.QUALITATIVE
@@ -25,7 +34,7 @@ async def run_evaluation(
     user_input = UserInput(
         user_query=user_query,
         app_url=app_url,
-        provider=provider,
+        provider=llm_provider,
         evaluation_type=eval_type,
         temperature=temperature
     )

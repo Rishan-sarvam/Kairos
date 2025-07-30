@@ -13,6 +13,7 @@ from langchain.agents import AgentExecutor, create_tool_calling_agent
 from anthropic import AnthropicVertex
 from pydantic import BaseModel, Field, create_model
 
+from ..prompts import test_plan_system_prompt, test_plan_prompt
 from ..base import LLMClient
 from ..models import LLMProvider
 from ..mcp_node import MCPToolManager
@@ -63,62 +64,20 @@ class ClaudeClient(LLMClient):
     def _provider(self) -> LLMProvider:
         return LLMProvider.CLAUDE_VERTEX
     
-    async def generate_response(self, prompt: str, **kwargs) -> str:
+    async def generate_response(self, prompt: str, system_prompt: str, **kwargs) -> str:
         """Generate a basic response using Anthropic client"""
         try:
             response = self.anthropic_client.messages.create(
                 model=self.llm_model_name,  
                 max_tokens=kwargs.get("max_tokens", 8192),
                 temperature=self.temperature,
+                system=system_prompt,
                 messages=[{"role": "user", "content": prompt}]
             )
             return response.content[0].text
         except Exception as e:
             raise Exception(f"Failed to generate response: {str(e)}")
-    
-    async def create_test_plan(self, user_query: str, html_content: str) -> str:
-        """Create a playwright test plan for the application"""
-        try:
-            prompt = f"""Create a comprehensive Playwright test plan for this web application.
 
-USER QUERY: {user_query}
-
-HTML CODE:
-{html_content}
-
-Please provide a detailed test plan that includes:
-1. Test case descriptions
-2. Specific Playwright selectors and actions
-3. **IMPORTANT**: Assertions to verify functionality. The assertions should include all the functionalitites of that particular test. Try to find deeper assertions.
-4. Make sure there are no duplicate assertions or redundant tests.
-5. Expected behaviors
-
-Output your response in this exact JSON format:
-
-```json
-[
-    {{
-        "Test_feature": "name of the test feature",
-        "Description": "description of the test feature", 
-        "Actions": "list of actions to be performed to test the feature",
-        "Assertions": "comprehensive list of assertions to be performed to test the feature"
-    }}
-]
-```
-
-Make sure to wrap the JSON with ```json and ``` code blocks."""
-
-            response = self.anthropic_client.messages.create(
-                model=self.llm_model_name,
-                max_tokens=8192,
-                temperature=0.3,
-                system=prompt,
-                messages=[{"role": "user", "content": prompt}]
-            )
-            
-            return response.content[0].text
-        except Exception as e:
-            raise Exception(f"Failed to create test plan: {str(e)}")
     
     async def run_evaluation_with_tools(self, evaluation_prompt: str, thread_id: Optional[int] = None) -> str:
         """Run evaluation using MCP tools and LangChain agent"""
@@ -166,8 +125,13 @@ Make sure to wrap the JSON with ```json and ``` code blocks."""
             
             # Run evaluation
             result = await executor.ainvoke({"input": evaluation_prompt})
-
-            await self.cleanup(thread_id)  
+            
+            try:
+                await self.cleanup(thread_id)  
+            except Exception as e:
+                print("warning: Error in cleaning up resources")
+                pass
+            
             return result["output"]
             
         except Exception as e:
